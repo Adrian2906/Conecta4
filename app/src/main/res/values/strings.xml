@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Conecta4</string>
     <string name="table_cell">Celda del tablero</string>
+    <string name="turn">Turno</string>
+    <string name="initial_scoreboard">0</string>
+    <string name="restart_scoreboard">Reiniciar marcador</string>
+    <string name="restart_match">Reiniciar partida</string>
 </resources>
