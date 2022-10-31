@@ -1,7 +1,7 @@
 # **CONECTA 4**
 
-Crea el juego conecta cuatro. Tienes un ejemplo parecido [aquí](https://solitariosonline.es/conecta-4).
-Este es uno de los retos de [mouredev](https://github.com/mouredev/Monthly-App-Challenge-2022)
+Crea el juego conecta cuatro. Tienes un ejemplo parecido [aquí](https://solitariosonline.es/conecta-4).  
+Este es uno de los retos de [mouredev](https://github.com/mouredev/Monthly-App-Challenge-2022).  
 
 ### **Requisitos**:
 
