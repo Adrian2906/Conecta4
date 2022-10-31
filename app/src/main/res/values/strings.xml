@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Conecta4</string>
+    <string name="table_cell">Celda del tablero</string>
 </resources>
