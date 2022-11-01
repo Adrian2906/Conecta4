@@ -16,6 +16,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restartScoreboardButton: Button
     private lateinit var restartMatchButton: Button
 
+    //TODO: first match starts the RED piece
+    // but second match starts the YELLOW piece
+    // third RED and so on
     private var currentPiece: Piece = Piece.RED
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +38,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setBoard() {
         boardLinearLayout = findViewById(R.id.boardLinearLayout)
-        //added temporally logic to board. Columns (board's children) should have the logic
+        //TODO: Columns (board's children) should have onClickListener not the board
         boardLinearLayout.setOnClickListener {
             when(currentPiece) {
                 Piece.RED -> changeToYellowPiece()
@@ -47,12 +50,15 @@ class MainActivity : AppCompatActivity() {
     private fun setButtons() {
         restartScoreboardButton = findViewById(R.id.restartScoreboardButton)
         restartScoreboardButton.setOnClickListener {
+            //TODO: it restart the scoreboard, but it should restart turn too??
+            // That is, RED should start always after restart scoreboard??
             redScoreboardTextView.text = "0"
             yellowScoreboardTextView.text = "0"
         }
 
         restartMatchButton = findViewById(R.id.restartMatchButton)
         restartMatchButton.setOnClickListener {
+            //TODO: restart match so current piece will be the start piece
             setCurrentPiece(Piece.RED)
             setTurnTextViewBackgroundColor(R.color.red)
         }
