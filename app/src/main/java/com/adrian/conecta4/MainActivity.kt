@@ -2,6 +2,7 @@ package com.adrian.conecta4
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 
@@ -12,6 +13,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var redScoreboardTextView: TextView
     private lateinit var yellowScoreboardTextView: TextView
 
+    private lateinit var restartScoreboardButton: Button
+    private lateinit var restartMatchButton: Button
+
     private var currentPiece: Piece = Piece.RED
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         setTextViews()
         setBoard()
+        setButtons()
     }
 
     private fun setTextViews() {
@@ -36,6 +41,20 @@ class MainActivity : AppCompatActivity() {
                 Piece.RED -> changeToYellowPiece()
                 Piece.YELLOW -> changeToRedPiece()
             }
+        }
+    }
+
+    private fun setButtons() {
+        restartScoreboardButton = findViewById(R.id.restartScoreboardButton)
+        restartScoreboardButton.setOnClickListener {
+            redScoreboardTextView.text = "0"
+            yellowScoreboardTextView.text = "0"
+        }
+
+        restartMatchButton = findViewById(R.id.restartMatchButton)
+        restartMatchButton.setOnClickListener {
+            setCurrentPiece(Piece.RED)
+            setTurnTextViewBackgroundColor(R.color.red)
         }
     }
 
