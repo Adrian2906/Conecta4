@@ -20,18 +20,16 @@ class MainActivity : AppCompatActivity() {
     private val CAN_NOT_MAKE_MOVE: Int = -1
     private val ALIGNED_PIECES_TO_WIN: Int = 4
 
-    private lateinit var boardLinearLayout: LinearLayout
+    private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
-    private lateinit var turnTextView: TextView
-    private lateinit var redScoreboardTextView: TextView
-    private lateinit var yellowScoreboardTextView: TextView
+    private val turnTextView: TextView by lazy { findViewById(R.id.turnTextView) }
+    private val redScoreboardTextView: TextView by lazy { findViewById(R.id.redScoreboardTextView) }
+    private val yellowScoreboardTextView: TextView by lazy { findViewById(R.id.yellowScoreboardTextView) }
 
-    private lateinit var restartScoreboardButton: Button
-    private lateinit var restartMatchButton: Button
+    private val restartScoreboardButton: Button by lazy { findViewById(R.id.restartScoreboardButton) }
+    private val restartMatchButton: Button by lazy { findViewById(R.id.restartMatchButton) }
 
-    private val EMPTY_CELL: Drawable by lazy {
-        resources.getDrawable(R.drawable.empty_cell, theme)
-    }
+    private val EMPTY_CELL: Drawable by lazy { resources.getDrawable(R.drawable.empty_cell, theme) }
 
     //TODO: first match starts the RED piece
     // but second match starts the YELLOW piece
@@ -43,20 +41,11 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
-        setTextViews()
-        setBoard()
-        setButtons()
+        setOnCLickBoard()
+        setOnClickButtons()
     }
 
-    private fun setTextViews() {
-        redScoreboardTextView = findViewById(R.id.redScoreboardTextView)
-        yellowScoreboardTextView = findViewById(R.id.yellowScoreboardTextView)
-        turnTextView = findViewById(R.id.turnTextView)
-    }
-
-    private fun setBoard() {
-        boardLinearLayout = findViewById(R.id.boardLinearLayout)
-
+    private fun setOnCLickBoard() {
         for (column in boardLinearLayout.children) {
             column.setOnClickListener { it as LinearLayout
                 play(it)
@@ -64,8 +53,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setButtons() {
-        restartScoreboardButton = findViewById(R.id.restartScoreboardButton)
+    private fun setOnClickButtons() {
         restartScoreboardButton.setOnClickListener {
             //TODO: it restart the scoreboard, but it should restart turn too??
             // That is, RED should start always after restart scoreboard??
@@ -73,7 +61,6 @@ class MainActivity : AppCompatActivity() {
             yellowScoreboardTextView.text = "0"
         }
 
-        restartMatchButton = findViewById(R.id.restartMatchButton)
         restartMatchButton.setOnClickListener {
             //TODO: restart match so current piece will be the start piece
             setCurrentPiece(Piece.RED)
