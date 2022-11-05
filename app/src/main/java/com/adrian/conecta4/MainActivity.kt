@@ -11,6 +11,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.children
 
+@SuppressLint("UseCompatLoadingForDrawables")
 class MainActivity : AppCompatActivity() {
     private val MAX_INDEX_ROW: Int = 5
     private val MIN_INDEX_ROW: Int = 0
@@ -28,8 +29,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var restartScoreboardButton: Button
     private lateinit var restartMatchButton: Button
 
-    //TODO: make it immutable
-    private lateinit var EMPTY_CELL: Drawable // in upper because it must be immutable
+    private val EMPTY_CELL: Drawable by lazy {
+        resources.getDrawable(R.drawable.empty_cell, theme)
+    }
+
     //TODO: first match starts the RED piece
     // but second match starts the YELLOW piece
     // third RED and so on
@@ -40,8 +43,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         supportActionBar?.hide()
 
-        @SuppressLint("UseCompatLoadingForDrawables")
-        EMPTY_CELL = resources.getDrawable(R.drawable.empty_cell, theme)
         setTextViews()
         setBoard()
         setButtons()
@@ -81,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     private fun play(column: LinearLayout) {
         val columnIndex = boardLinearLayout.indexOfChild(column)
         val drawable = resources.getDrawable(currentPiece.resourceDrawableId, theme)
