@@ -92,6 +92,7 @@ class MainActivity : AppCompatActivity() {
         val isWinner = isWinner(columnIndex, rowIndexPlayed, drawable)
 
         if (isWinner) {
+            //TODO: show notification in dialog and clearBoard when it closed
             Toast.makeText(this@MainActivity, "FOO", Toast.LENGTH_LONG).show()
             sumScore()
             clearBoard()
