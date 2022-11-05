@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        supportActionBar?.hide()
 
         @SuppressLint("UseCompatLoadingForDrawables")
         EMPTY_CELL = resources.getDrawable(R.drawable.empty_cell, theme)
