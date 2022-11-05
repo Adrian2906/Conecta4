@@ -64,7 +64,6 @@ class MainActivity : AppCompatActivity() {
         restartMatchButton.setOnClickListener {
             //TODO: restart match so current piece will be the start piece
             setCurrentPiece(Piece.RED)
-            setTurnTextViewBackgroundColor(Piece.RED.resourceColorId)
             clearBoard()
         }
     }
@@ -87,7 +86,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         val nextPiece = currentPiece.otherPiece
-        setTurnTextViewBackgroundColor(nextPiece.resourceColorId)
         setCurrentPiece(nextPiece)
     }
 
@@ -115,13 +113,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setCurrentPiece(piece: Piece) {
+        currentPiece = piece
+        setTurnTextViewBackgroundColor(currentPiece.resourceColorId)
+    }
+
     private fun setTurnTextViewBackgroundColor(resourceId: Int) {
         val color =  resources.getColor(resourceId)
         turnTextView.setBackgroundColor(color)
-    }
-
-    private fun setCurrentPiece(piece: Piece) {
-        currentPiece = piece
     }
 
     private fun putPieceOnBoard(column: LinearLayout, drawable: Drawable, index: Int = MAX_INDEX_ROW): Int {
