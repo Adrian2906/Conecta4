@@ -74,13 +74,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun play(column: LinearLayout) {
-        val drawable = getDrawableFromPiece(currentPiece)
+        val drawable = resources.getDrawable(currentPiece.resourceDrawableId, theme)
         val played = putPieceOnBoard(column, drawable)
 
         if (played) {
-            val nextPiece = currentPiece.otherPiece()
-            setTurnTextViewBackgroundColor(nextPiece.resourceColor)
+            val nextPiece = currentPiece.otherPiece
+            setTurnTextViewBackgroundColor(nextPiece.resourceColorId)
             setCurrentPiece(nextPiece)
         }
     }
@@ -109,32 +110,32 @@ class MainActivity : AppCompatActivity() {
         cell.setImageDrawable(drawable)
         return true
     }
-
-    @SuppressLint("UseCompatLoadingForDrawables")
-    private fun getDrawableFromPiece(piece: Piece): Drawable {
-        return when(piece) {
-            Piece.RED -> resources.getDrawable(R.drawable.red_cell, theme)
-            Piece.YELLOW -> resources.getDrawable(R.drawable.yellow_cell, theme)
-        }
-    }
 }
 
 //TODO: extract to file
 enum class Piece {
     RED {
-        override val resourceColor: Int
+        override val resourceColorId: Int
             get() = R.color.red
+
+        override val resourceDrawableId: Int
+            get() = R.drawable.red_cell
+
+        override val otherPiece: Piece
+            get() = YELLOW
     },
     YELLOW {
-        override val resourceColor: Int
+        override val resourceColorId: Int
             get() = R.color.yellow
+
+        override val resourceDrawableId: Int
+            get() = R.drawable.yellow_cell
+
+        override val otherPiece: Piece
+            get() = RED
     };
 
-    abstract val resourceColor: Int
-    fun otherPiece(): Piece {
-        return when (this) {
-            RED -> YELLOW
-            YELLOW -> RED
-        }
-    }
+    abstract val resourceColorId: Int
+    abstract val resourceDrawableId: Int
+    abstract val otherPiece: Piece
 }
