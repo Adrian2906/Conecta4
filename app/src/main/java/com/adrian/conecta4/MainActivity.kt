@@ -13,12 +13,12 @@ import androidx.core.view.children
 
 @SuppressLint("UseCompatLoadingForDrawables")
 class MainActivity : AppCompatActivity() {
-    private val MAX_INDEX_ROW: Int = 5
-    private val MIN_INDEX_ROW: Int = 0
-    private val MIN_INDEX_COLUMN: Int = 0
-    private val MAX_INDEX_COLUMN: Int = 6
-    private val CAN_NOT_MAKE_MOVE: Int = -1
-    private val ALIGNED_PIECES_TO_WIN: Int = 4
+    private val maxIndexRow: Int = 5
+    private val minIndexRow: Int = 0
+    private val minIndexColumn: Int = 0
+    private val maxIndexColumn: Int = 6
+    private val canNotMakeMove: Int = -1
+    private val alignedPiecesToWin: Int = 4
 
     private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val restartScoreboardButton: Button by lazy { findViewById(R.id.restartScoreboardButton) }
     private val restartGameButton: Button by lazy { findViewById(R.id.restartGameButton) }
 
-    private val EMPTY_CELL: Drawable by lazy { resources.getDrawable(R.drawable.empty_cell, theme) }
+    private val emptyCell: Drawable by lazy { resources.getDrawable(R.drawable.empty_cell, theme) }
 
     private var initialPiece: Piece = Piece.RED
     private var currentPiece: Piece = Piece.RED
@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         val drawable = resources.getDrawable(currentPiece.resourceDrawableId, theme)
         val rowIndexPlayed = putPieceOnBoard(column, drawable)
 
-        if (CAN_NOT_MAKE_MOVE == rowIndexPlayed) return
+        if (canNotMakeMove == rowIndexPlayed) return
 
         val isWinner = isWinner(columnIndex, rowIndexPlayed, drawable)
 
@@ -105,7 +105,7 @@ class MainActivity : AppCompatActivity() {
         columns.forEach { column ->
             column as LinearLayout
             column.children.forEach { it as ImageView
-                it.setImageDrawable(EMPTY_CELL)
+                it.setImageDrawable(emptyCell)
             }
         }
     }
@@ -134,13 +134,13 @@ class MainActivity : AppCompatActivity() {
         turnTextView.setBackgroundColor(color)
     }
 
-    private fun putPieceOnBoard(column: LinearLayout, drawable: Drawable, index: Int = MAX_INDEX_ROW): Int {
-        if (index < MIN_INDEX_ROW)
-            return CAN_NOT_MAKE_MOVE
+    private fun putPieceOnBoard(column: LinearLayout, drawable: Drawable, index: Int = maxIndexRow): Int {
+        if (index < minIndexRow)
+            return canNotMakeMove
 
         val cell = column.getChildAt(index) as ImageView
 
-        if (cell.drawable.constantState != EMPTY_CELL.constantState)
+        if (cell.drawable.constantState != emptyCell.constantState)
             return putPieceOnBoard(column, drawable, index - 1)
 
         cell.setImageDrawable(drawable)
@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         var brakeChain = false
         var index = columnIndex
 
-        while (index > MIN_INDEX_COLUMN && !brakeChain) {
+        while (index > minIndexColumn && !brakeChain) {
             index--
             val column = boardLinearLayout.getChildAt(index) as LinearLayout
             val cell = column.getChildAt(rowIndex) as ImageView
@@ -172,7 +172,7 @@ class MainActivity : AppCompatActivity() {
         brakeChain = false
         index = columnIndex
 
-        while (index < MAX_INDEX_COLUMN && !brakeChain) {
+        while (index < maxIndexColumn && !brakeChain) {
             index++
             val column = boardLinearLayout.getChildAt(index) as LinearLayout
             val cell = column.getChildAt(rowIndex) as ImageView
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
         //RIGHT
         //CHECK HORIZONTAL PIECES
 
-        if (alignedPiecesCount >= ALIGNED_PIECES_TO_WIN) return true
+        if (alignedPiecesCount >= alignedPiecesToWin) return true
         alignedPiecesCount = 1
 
         //CHECK VERTICAL PIECES
@@ -195,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         brakeChain = false
         index = rowIndex
 
-        while (index < MAX_INDEX_ROW && !brakeChain) {
+        while (index < maxIndexRow && !brakeChain) {
             index++
             val cell = playedColumn.getChildAt(index) as ImageView
 
@@ -210,7 +210,7 @@ class MainActivity : AppCompatActivity() {
         brakeChain = false
         index = rowIndex
 
-        while (index > MIN_INDEX_ROW && !brakeChain) {
+        while (index > minIndexRow && !brakeChain) {
             index--
             val cell = playedColumn.getChildAt(index) as ImageView
 
@@ -222,7 +222,7 @@ class MainActivity : AppCompatActivity() {
         //UP
         //CHECK VERTICAL PIECES
 
-        if (alignedPiecesCount >= ALIGNED_PIECES_TO_WIN) return true
+        if (alignedPiecesCount >= alignedPiecesToWin) return true
         alignedPiecesCount = 1
 
         //CHECK DIAGONAL PIECES
@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
         var verticalIndex = rowIndex
 
         //DOWN AND LEFT
-        while (horizontalIndex > MIN_INDEX_COLUMN && verticalIndex < MAX_INDEX_ROW && !brakeChain) {
+        while (horizontalIndex > minIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
             horizontalIndex--
             verticalIndex++
 
@@ -250,7 +250,7 @@ class MainActivity : AppCompatActivity() {
         horizontalIndex = columnIndex
         verticalIndex = rowIndex
 
-        while (horizontalIndex < MAX_INDEX_COLUMN && verticalIndex < MAX_INDEX_ROW && !brakeChain) {
+        while (horizontalIndex < maxIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
             horizontalIndex++
             verticalIndex++
 
@@ -269,7 +269,7 @@ class MainActivity : AppCompatActivity() {
         horizontalIndex = columnIndex
         verticalIndex = rowIndex
 
-        while (horizontalIndex < MAX_INDEX_COLUMN && verticalIndex > MIN_INDEX_ROW && !brakeChain) {
+        while (horizontalIndex < maxIndexColumn && verticalIndex > minIndexRow && !brakeChain) {
             horizontalIndex++
             verticalIndex--
 
@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity() {
         horizontalIndex = columnIndex
         verticalIndex = rowIndex
 
-        while (horizontalIndex > MIN_INDEX_COLUMN && verticalIndex > MIN_INDEX_ROW && !brakeChain) {
+        while (horizontalIndex > minIndexColumn && verticalIndex > minIndexRow && !brakeChain) {
             horizontalIndex--
             verticalIndex--
 
@@ -303,6 +303,6 @@ class MainActivity : AppCompatActivity() {
         //UP AND LEFT
         //CHECK DIAGONAL PIECES
 
-        return alignedPiecesCount >= ALIGNED_PIECES_TO_WIN
+        return alignedPiecesCount >= alignedPiecesToWin
     }
 }
