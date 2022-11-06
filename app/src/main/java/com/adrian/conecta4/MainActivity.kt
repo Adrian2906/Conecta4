@@ -73,12 +73,11 @@ class MainActivity : AppCompatActivity() {
 
         if (isWinner) {
             sumScore()
-            //TODO: refactor hardcoded strings
             AlertDialog.Builder(this)
-                .setTitle("VICTORIA!!")
-                .setMessage("JUGADOR {PIECE_NAME} GANA")
+                .setTitle(R.string.dialog_title)
+                .setMessage(getString(R.string.dialog_message, currentPiece.spanishName))
                 .setCancelable(false)
-                .setNeutralButton("CERRAR"){ _, _ ->
+                .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
                     startNewGame()
                 }
                 .create()

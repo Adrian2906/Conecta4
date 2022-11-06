@@ -10,6 +10,9 @@ enum class Piece {
 
         override val otherPiece: Piece
             get() = YELLOW
+
+        override val spanishName: String
+            get() = "ROJO"
     },
     YELLOW {
         override val resourceColorId: Int
@@ -20,9 +23,13 @@ enum class Piece {
 
         override val otherPiece: Piece
             get() = RED
+
+        override val spanishName: String
+            get() = "AMARILLO"
     };
 
     abstract val resourceColorId: Int
     abstract val resourceDrawableId: Int
     abstract val otherPiece: Piece
+    abstract val spanishName: String
 }
