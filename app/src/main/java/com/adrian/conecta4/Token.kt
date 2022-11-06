@@ -1,6 +1,6 @@
 package com.adrian.conecta4
 
-enum class Piece {
+enum class Token {
     RED {
         override val resourceColorId: Int
             get() = R.color.red
@@ -8,7 +8,7 @@ enum class Piece {
         override val resourceDrawableId: Int
             get() = R.drawable.red_cell
 
-        override val otherPiece: Piece
+        override val otherToken: Token
             get() = YELLOW
 
         override val spanishName: String
@@ -21,7 +21,7 @@ enum class Piece {
         override val resourceDrawableId: Int
             get() = R.drawable.yellow_cell
 
-        override val otherPiece: Piece
+        override val otherToken: Token
             get() = RED
 
         override val spanishName: String
@@ -30,6 +30,6 @@ enum class Piece {
 
     abstract val resourceColorId: Int
     abstract val resourceDrawableId: Int
-    abstract val otherPiece: Piece
+    abstract val otherToken: Token
     abstract val spanishName: String
 }

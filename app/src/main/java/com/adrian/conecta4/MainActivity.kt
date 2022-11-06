@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private val minIndexColumn: Int = 0
     private val maxIndexColumn: Int = 6
     private val canNotMakeMove: Int = -1
-    private val alignedPiecesToWin: Int = 4
+    private val alignedTokensToWin: Int = 4
 
     private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
@@ -31,8 +31,8 @@ class MainActivity : AppCompatActivity() {
 
     private val emptyCell: Drawable by lazy { resources.getDrawable(R.drawable.empty_cell, theme) }
 
-    private var initialPiece: Piece = Piece.RED
-    private var currentPiece: Piece = Piece.RED
+    private var initialToken: Token = Token.RED
+    private var currentToken: Token = Token.RED
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,8 +64,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun play(column: LinearLayout) {
         val columnIndex = boardLinearLayout.indexOfChild(column)
-        val drawable = resources.getDrawable(currentPiece.resourceDrawableId, theme)
-        val rowIndexPlayed = putPieceOnBoard(column, drawable)
+        val drawable = resources.getDrawable(currentToken.resourceDrawableId, theme)
+        val rowIndexPlayed = putTokenOnBoard(column, drawable)
 
         if (canNotMakeMove == rowIndexPlayed) return
 
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
             sumScore()
             AlertDialog.Builder(this)
                 .setTitle(R.string.dialog_title)
-                .setMessage(getString(R.string.dialog_message, currentPiece.spanishName))
+                .setMessage(getString(R.string.dialog_message, currentToken.spanishName))
                 .setCancelable(false)
                 .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
                     startNewGame()
@@ -86,18 +86,17 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        val nextPiece = currentPiece.otherPiece
-        setCurrentPiece(nextPiece)
+        setCurrentToken(currentToken.otherToken)
     }
 
     private fun startNewGame() {
-        initialPiece = initialPiece.otherPiece
+        initialToken = initialToken.otherToken
         startGame()
     }
 
     private fun startGame() {
         clearBoard()
-        setCurrentPiece(initialPiece)
+        setCurrentToken(initialToken)
     }
 
     private fun clearBoard() {
@@ -111,22 +110,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sumScore() {
-        val scoreboard = getScoreboardTextViewByCurrentPiece()
+        val scoreboard = getScoreboardTextViewByCurrentToken()
         var score = scoreboard.text.toString().toInt()
         score++
         scoreboard.text = score.toString()
     }
 
-    private fun getScoreboardTextViewByCurrentPiece(): TextView {
-        return when(currentPiece) {
-            Piece.RED -> redScoreboardTextView
-            Piece.YELLOW -> yellowScoreboardTextView
+    private fun getScoreboardTextViewByCurrentToken(): TextView {
+        return when(currentToken) {
+            Token.RED -> redScoreboardTextView
+            Token.YELLOW -> yellowScoreboardTextView
         }
     }
 
-    private fun setCurrentPiece(piece: Piece) {
-        currentPiece = piece
-        setTurnTextViewBackgroundColor(currentPiece.resourceColorId)
+    private fun setCurrentToken(token: Token) {
+        currentToken = token
+        setTurnTextViewBackgroundColor(currentToken.resourceColorId)
     }
 
     private fun setTurnTextViewBackgroundColor(resourceId: Int) {
@@ -134,14 +133,14 @@ class MainActivity : AppCompatActivity() {
         turnTextView.setBackgroundColor(color)
     }
 
-    private fun putPieceOnBoard(column: LinearLayout, drawable: Drawable, index: Int = maxIndexRow): Int {
+    private fun putTokenOnBoard(column: LinearLayout, drawable: Drawable, index: Int = maxIndexRow): Int {
         if (index < minIndexRow)
             return canNotMakeMove
 
         val cell = column.getChildAt(index) as ImageView
 
         if (cell.drawable.constantState != emptyCell.constantState)
-            return putPieceOnBoard(column, drawable, index - 1)
+            return putTokenOnBoard(column, drawable, index - 1)
 
         cell.setImageDrawable(drawable)
         return index
@@ -149,9 +148,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun isWinner(columnIndex: Int, rowIndex: Int, drawable: Drawable): Boolean {
         //TODO: REFACTOR
-        var alignedPiecesCount = 1
+        var alignedTokensCount = 1
 
-        //CHECK HORIZONTAL PIECES
+        //CHECK HORIZONTAL TOKENS
         //LEFT
         var brakeChain = false
         var index = columnIndex
@@ -162,7 +161,7 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(rowIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
@@ -178,17 +177,17 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(rowIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
         //RIGHT
-        //CHECK HORIZONTAL PIECES
+        //CHECK HORIZONTAL TOKENS
 
-        if (alignedPiecesCount >= alignedPiecesToWin) return true
-        alignedPiecesCount = 1
+        if (alignedTokensCount >= alignedTokensToWin) return true
+        alignedTokensCount = 1
 
-        //CHECK VERTICAL PIECES
+        //CHECK VERTICAL TOKENS
         val playedColumn = boardLinearLayout.getChildAt(columnIndex) as LinearLayout
 
         //DOWN
@@ -200,7 +199,7 @@ class MainActivity : AppCompatActivity() {
             val cell = playedColumn.getChildAt(index) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
@@ -215,17 +214,17 @@ class MainActivity : AppCompatActivity() {
             val cell = playedColumn.getChildAt(index) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
         //UP
-        //CHECK VERTICAL PIECES
+        //CHECK VERTICAL TOKENS
 
-        if (alignedPiecesCount >= alignedPiecesToWin) return true
-        alignedPiecesCount = 1
+        if (alignedTokensCount >= alignedTokensToWin) return true
+        alignedTokensCount = 1
 
-        //CHECK DIAGONAL PIECES
+        //CHECK DIAGONAL TOKENS
         brakeChain = false
         var horizontalIndex = columnIndex
         var verticalIndex = rowIndex
@@ -239,7 +238,7 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(verticalIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
@@ -258,7 +257,7 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(verticalIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
@@ -277,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(verticalIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
@@ -296,13 +295,13 @@ class MainActivity : AppCompatActivity() {
             val cell = column.getChildAt(verticalIndex) as ImageView
 
             if (cell.drawable.constantState == drawable.constantState)
-                alignedPiecesCount += 1
+                alignedTokensCount += 1
             else
                 brakeChain = true
         }
         //UP AND LEFT
-        //CHECK DIAGONAL PIECES
+        //CHECK DIAGONAL TOKENS
 
-        return alignedPiecesCount >= alignedPiecesToWin
+        return alignedTokensCount >= alignedTokensToWin
     }
 }
