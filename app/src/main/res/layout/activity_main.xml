@@ -496,13 +496,13 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/restartMatchButton"
+                android:id="@+id/restartGameButton"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:text="@string/restart_match"
+                android:text="@string/restart_game"
                 style="@style/ShapeAppearanceOverlay.Material3.Button"/>
 
             <Button

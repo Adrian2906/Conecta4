@@ -4,5 +4,5 @@
     <string name="turn">Turno</string>
     <string name="initial_scoreboard">0</string>
     <string name="restart_scoreboard">Reiniciar marcador</string>
-    <string name="restart_match">Reiniciar partida</string>
+    <string name="restart_game">Reiniciar partida</string>
 </resources>

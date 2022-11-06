@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.children
 
 @SuppressLint("UseCompatLoadingForDrawables")
@@ -27,13 +27,11 @@ class MainActivity : AppCompatActivity() {
     private val yellowScoreboardTextView: TextView by lazy { findViewById(R.id.yellowScoreboardTextView) }
 
     private val restartScoreboardButton: Button by lazy { findViewById(R.id.restartScoreboardButton) }
-    private val restartMatchButton: Button by lazy { findViewById(R.id.restartMatchButton) }
+    private val restartGameButton: Button by lazy { findViewById(R.id.restartGameButton) }
 
     private val EMPTY_CELL: Drawable by lazy { resources.getDrawable(R.drawable.empty_cell, theme) }
 
-    //TODO: first match starts the RED piece
-    // but second match starts the YELLOW piece
-    // third RED and so on
+    private var initialPiece: Piece = Piece.RED
     private var currentPiece: Piece = Piece.RED
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,16 +53,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setOnClickButtons() {
         restartScoreboardButton.setOnClickListener {
-            //TODO: it restart the scoreboard, but it should restart turn too??
-            // That is, RED should start always after restart scoreboard??
             redScoreboardTextView.text = "0"
             yellowScoreboardTextView.text = "0"
         }
 
-        restartMatchButton.setOnClickListener {
-            //TODO: restart match so current piece will be the start piece
-            setCurrentPiece(Piece.RED)
-            clearBoard()
+        restartGameButton.setOnClickListener {
+            startGame()
         }
     }
 
@@ -78,15 +72,33 @@ class MainActivity : AppCompatActivity() {
         val isWinner = isWinner(columnIndex, rowIndexPlayed, drawable)
 
         if (isWinner) {
-            //TODO: show notification in dialog and clearBoard when it closed
-            Toast.makeText(this@MainActivity, "FOO", Toast.LENGTH_LONG).show()
             sumScore()
-            clearBoard()
+            //TODO: refactor hardcoded strings
+            AlertDialog.Builder(this)
+                .setTitle("VICTORIA!!")
+                .setMessage("JUGADOR {PIECE_NAME} GANA")
+                .setCancelable(false)
+                .setNeutralButton("CERRAR"){ _, _ ->
+                    startNewGame()
+                }
+                .create()
+                .show()
+
             return
         }
 
         val nextPiece = currentPiece.otherPiece
         setCurrentPiece(nextPiece)
+    }
+
+    private fun startNewGame() {
+        initialPiece = initialPiece.otherPiece
+        startGame()
+    }
+
+    private fun startGame() {
+        clearBoard()
+        setCurrentPiece(initialPiece)
     }
 
     private fun clearBoard() {
