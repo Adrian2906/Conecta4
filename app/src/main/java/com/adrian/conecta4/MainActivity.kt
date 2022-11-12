@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private val maxIndexColumn: Int = 6
     private val canNotMakeMove: Int = -1
     private val alignedTokensToWin: Int = 4
+    private val maxTokens: Int = 42
 
     private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
@@ -33,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private var initialToken: Token = Token.RED
     private var currentToken: Token = Token.RED
+    private var tokensPlayed: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,8 +76,23 @@ class MainActivity : AppCompatActivity() {
         if (isWinner) {
             sumScore()
             AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_title)
+                .setTitle(R.string.dialog_win_title)
                 .setMessage(getString(R.string.dialog_message, currentToken.spanishName))
+                .setCancelable(false)
+                .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
+                    startNewGame()
+                }
+                .create()
+                .show()
+
+            return
+        }
+
+        tokensPlayed++
+
+        if (maxTokens == tokensPlayed) {
+            AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_draw_title)
                 .setCancelable(false)
                 .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
                     startNewGame()
@@ -95,6 +112,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startGame() {
+        tokensPlayed = 0
         clearBoard()
         setCurrentToken(initialToken)
     }
@@ -225,6 +243,9 @@ class MainActivity : AppCompatActivity() {
         alignedTokensCount = 1
 
         //CHECK DIAGONAL TOKENS
+        //SAME DIAGONALS
+        //DOWN AND LEFT - UP AND RIGHT
+        //DOWN AND RIGHT - UP AND LEFT
         brakeChain = false
         var horizontalIndex = columnIndex
         var verticalIndex = rowIndex
@@ -244,25 +265,6 @@ class MainActivity : AppCompatActivity() {
         }
         //DOWN AND LEFT
 
-        //DOWN AND RIGHT
-        brakeChain = false
-        horizontalIndex = columnIndex
-        verticalIndex = rowIndex
-
-        while (horizontalIndex < maxIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
-            horizontalIndex++
-            verticalIndex++
-
-            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
-            val cell = column.getChildAt(verticalIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //DOWN AND RIGHT
-
         //UP AND RIGHT
         brakeChain = false
         horizontalIndex = columnIndex
@@ -281,6 +283,28 @@ class MainActivity : AppCompatActivity() {
                 brakeChain = true
         }
         //UP AND RIGHT
+
+        if (alignedTokensCount >= alignedTokensToWin) return true
+        alignedTokensCount = 1
+
+        //DOWN AND RIGHT
+        brakeChain = false
+        horizontalIndex = columnIndex
+        verticalIndex = rowIndex
+
+        while (horizontalIndex < maxIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
+            horizontalIndex++
+            verticalIndex++
+
+            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
+            val cell = column.getChildAt(verticalIndex) as ImageView
+
+            if (cell.drawable.constantState == drawable.constantState)
+                alignedTokensCount += 1
+            else
+                brakeChain = true
+        }
+        //DOWN AND RIGHT
 
         //UP AND LEFT
         brakeChain = false
