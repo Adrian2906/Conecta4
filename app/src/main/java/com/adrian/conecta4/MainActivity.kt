@@ -71,7 +71,8 @@ class MainActivity : AppCompatActivity() {
 
         if (canNotMakeMove == rowIndexPlayed) return
 
-        val isWinner = isWinner(columnIndex, rowIndexPlayed, drawable)
+        val turn = Turn(columnIndex, rowIndexPlayed, drawable)
+        val isWinner = isWinner(turn)
 
         if (isWinner) {
             sumScore()
@@ -164,168 +165,76 @@ class MainActivity : AppCompatActivity() {
         return index
     }
 
-    private fun isWinner(columnIndex: Int, rowIndex: Int, drawable: Drawable): Boolean {
-        //TODO: REFACTOR
-        var alignedTokensCount = 1
+    private fun isWinner(turn: Turn): Boolean {
+        val horizontalTokensCount = countHorizontal(turn)
+        if (hasLineUpEnough(plusOne(horizontalTokensCount))) return true
 
-        //CHECK HORIZONTAL TOKENS
-        //LEFT
-        var brakeChain = false
-        var index = columnIndex
+        val verticalTokensCount = countVertical(turn)
+        if (hasLineUpEnough(plusOne(verticalTokensCount))) return true
 
-        while (index > minIndexColumn && !brakeChain) {
-            index--
-            val column = boardLinearLayout.getChildAt(index) as LinearLayout
-            val cell = column.getChildAt(rowIndex) as ImageView
+        val softDiagonalTokensCount = countSoftDiagonal(turn)
+        if (hasLineUpEnough(plusOne(softDiagonalTokensCount))) return true
 
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //LEFT
+        val hardDiagonalTokensCount = countHardDiagonal(turn)
+        if (hasLineUpEnough(plusOne(hardDiagonalTokensCount))) return true
 
-        //RIGHT
-        brakeChain = false
-        index = columnIndex
-
-        while (index < maxIndexColumn && !brakeChain) {
-            index++
-            val column = boardLinearLayout.getChildAt(index) as LinearLayout
-            val cell = column.getChildAt(rowIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //RIGHT
-        //CHECK HORIZONTAL TOKENS
-
-        if (alignedTokensCount >= alignedTokensToWin) return true
-        alignedTokensCount = 1
-
-        //CHECK VERTICAL TOKENS
-        val playedColumn = boardLinearLayout.getChildAt(columnIndex) as LinearLayout
-
-        //DOWN
-        brakeChain = false
-        index = rowIndex
-
-        while (index < maxIndexRow && !brakeChain) {
-            index++
-            val cell = playedColumn.getChildAt(index) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //DOWN
-
-        //UP
-        brakeChain = false
-        index = rowIndex
-
-        while (index > minIndexRow && !brakeChain) {
-            index--
-            val cell = playedColumn.getChildAt(index) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //UP
-        //CHECK VERTICAL TOKENS
-
-        if (alignedTokensCount >= alignedTokensToWin) return true
-        alignedTokensCount = 1
-
-        //CHECK DIAGONAL TOKENS
-        //SAME DIAGONALS
-        //DOWN AND LEFT - UP AND RIGHT
-        //DOWN AND RIGHT - UP AND LEFT
-        brakeChain = false
-        var horizontalIndex = columnIndex
-        var verticalIndex = rowIndex
-
-        //DOWN AND LEFT
-        while (horizontalIndex > minIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
-            horizontalIndex--
-            verticalIndex++
-
-            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
-            val cell = column.getChildAt(verticalIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //DOWN AND LEFT
-
-        //UP AND RIGHT
-        brakeChain = false
-        horizontalIndex = columnIndex
-        verticalIndex = rowIndex
-
-        while (horizontalIndex < maxIndexColumn && verticalIndex > minIndexRow && !brakeChain) {
-            horizontalIndex++
-            verticalIndex--
-
-            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
-            val cell = column.getChildAt(verticalIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //UP AND RIGHT
-
-        if (alignedTokensCount >= alignedTokensToWin) return true
-        alignedTokensCount = 1
-
-        //DOWN AND RIGHT
-        brakeChain = false
-        horizontalIndex = columnIndex
-        verticalIndex = rowIndex
-
-        while (horizontalIndex < maxIndexColumn && verticalIndex < maxIndexRow && !brakeChain) {
-            horizontalIndex++
-            verticalIndex++
-
-            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
-            val cell = column.getChildAt(verticalIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //DOWN AND RIGHT
-
-        //UP AND LEFT
-        brakeChain = false
-        horizontalIndex = columnIndex
-        verticalIndex = rowIndex
-
-        while (horizontalIndex > minIndexColumn && verticalIndex > minIndexRow && !brakeChain) {
-            horizontalIndex--
-            verticalIndex--
-
-            val column = boardLinearLayout.getChildAt(horizontalIndex) as LinearLayout
-            val cell = column.getChildAt(verticalIndex) as ImageView
-
-            if (cell.drawable.constantState == drawable.constantState)
-                alignedTokensCount += 1
-            else
-                brakeChain = true
-        }
-        //UP AND LEFT
-        //CHECK DIAGONAL TOKENS
-
-        return alignedTokensCount >= alignedTokensToWin
+        return false
     }
+
+    private fun countHorizontal(turn: Turn): Int {
+        val cellsToLeft = countSameTokens(subtractOne, notModifier, turn)
+        val cellsToRight = countSameTokens(plusOne, notModifier, turn)
+
+        return cellsToLeft + cellsToRight
+    }
+
+    private fun countVertical(turn: Turn): Int {
+        val cellsToUp = countSameTokens(notModifier, plusOne, turn)
+        val cellsToDown = countSameTokens(notModifier, subtractOne, turn)
+
+        return cellsToUp + cellsToDown
+    }
+
+    private fun countSoftDiagonal(turn: Turn): Int {
+        val cellsToUpAndLeft = countSameTokens(subtractOne, plusOne, turn)
+        val cellsToDownAndRight = countSameTokens(plusOne, subtractOne, turn)
+
+        return cellsToUpAndLeft + cellsToDownAndRight
+    }
+
+    private fun countHardDiagonal(turn: Turn): Int {
+        val cellsToUpAndRight = countSameTokens(plusOne, plusOne, turn)
+        val cellsToDownAndLeft = countSameTokens(subtractOne, subtractOne, turn)
+
+        return cellsToUpAndRight + cellsToDownAndLeft
+    }
+
+    private fun getCell(columnIndex: Int, rowIndex: Int): ImageView? {
+        val column = boardLinearLayout.getChildAt(columnIndex) as LinearLayout? ?: return null
+        return column.getChildAt(rowIndex) as ImageView?
+    }
+
+    private fun countSameTokens(
+        modifierColumnIndex: (Int) -> Int,
+        modifierRowIndex: (Int) -> Int,
+        turn: Turn,
+        count: Int = 0
+    ): Int {
+        val columnIndexModified = modifierColumnIndex(turn.columnIndex)
+        val rowIndexModified = modifierRowIndex(turn.rowIndex)
+        val cell = getCell(columnIndexModified, rowIndexModified)
+
+        if (isTokenInCell(turn.drawable, cell)) {
+            val modifiedTurn = turn.copy(columnIndex = columnIndexModified, rowIndex = rowIndexModified)
+            return countSameTokens(modifierColumnIndex, modifierRowIndex, modifiedTurn, plusOne(count))
+        }
+
+        return count
+    }
+
+    private val plusOne = {num: Int -> num + 1}
+    private val subtractOne = {num: Int -> num - 1}
+    private val notModifier = {num: Int -> num}
+    private val isTokenInCell = {drawable: Drawable, cell: ImageView? -> cell != null && drawable.constantState == cell.drawable.constantState}
+    private val hasLineUpEnough = {alignedTokensCount: Int -> alignedTokensCount >= alignedTokensToWin}
 }
