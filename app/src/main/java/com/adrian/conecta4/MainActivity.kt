@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
     private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
-    private val turnTextView: TextView by lazy { findViewById(R.id.turnTextView) }
+    private val turnImageView: ImageView by lazy { findViewById(R.id.turnTextView) }
     private val redScoreboardTextView: TextView by lazy { findViewById(R.id.redScoreboardTextView) }
     private val yellowScoreboardTextView: TextView by lazy { findViewById(R.id.yellowScoreboardTextView) }
 
@@ -144,12 +144,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setCurrentToken(token: Token) {
         currentToken = token
-        setTurnTextViewBackgroundColor(currentToken.resourceColorId)
+        setDrawableToTurnImageView(currentToken.resourceDrawableId)
     }
 
-    private fun setTurnTextViewBackgroundColor(resourceId: Int) {
-        val color =  resources.getColor(resourceId)
-        turnTextView.setBackgroundColor(color)
+    private fun setDrawableToTurnImageView(resourceId: Int) {
+        val drawable =  resources.getDrawable(resourceId, theme)
+        turnImageView.setImageDrawable(drawable)
     }
 
     private fun putTokenOnBoard(column: LinearLayout, drawable: Drawable, index: Int = maxIndexRow): Int {

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/teal_200"
+    android:background="@color/purple_700"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -24,24 +24,20 @@
                 android:layout_height="60dp"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@color/red"
+                android:background="@drawable/border_radius"
                 android:gravity="center"
                 android:text="@string/initial_scoreboard"
-                android:textColor="@color/black"
+                android:textColor="@color/red"
                 android:textSize="20sp" />
 
-            <TextView
+            <ImageView
                 android:id="@+id/turnTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="60dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:layout_margin="10dp"
-                android:layout_weight="1"
-                android:background="@color/red"
-                android:gravity="center"
-                android:text="@string/turn"
-                android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:layout_gravity="center"
+                android:background="@drawable/red_cell"
+                android:contentDescription="@string/turn" />
 
             <TextView
                 android:id="@+id/yellowScoreboardTextView"
@@ -49,10 +45,10 @@
                 android:layout_height="60dp"
                 android:layout_margin="10dp"
                 android:layout_weight="1"
-                android:background="@color/yellow"
+                android:background="@drawable/border_radius"
                 android:gravity="center"
                 android:text="@string/initial_scoreboard"
-                android:textColor="@color/black"
+                android:textColor="@color/yellow"
                 android:textSize="20sp" />
         </LinearLayout>
 
