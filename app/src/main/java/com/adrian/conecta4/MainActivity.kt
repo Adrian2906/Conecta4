@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.children
 
@@ -15,11 +12,7 @@ import androidx.core.view.children
 class MainActivity : AppCompatActivity() {
     private val maxIndexRow: Int = 5
     private val minIndexRow: Int = 0
-    private val minIndexColumn: Int = 0
     private val maxIndexColumn: Int = 6
-    private val canNotMakeMove: Int = -1
-    private val alignedTokensToWin: Int = 4
-    private val maxTokens: Int = 42
 
     private val boardLinearLayout: LinearLayout by lazy { findViewById(R.id.boardLinearLayout) }
 
@@ -34,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
     private var initialToken: Token = Token.RED
     private var currentToken: Token = Token.RED
-    private var tokensPlayed: Int = 0
+    private val game: Game by lazy { Game(boardLinearLayout) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,43 +61,36 @@ class MainActivity : AppCompatActivity() {
         val columnIndex = boardLinearLayout.indexOfChild(column)
         val drawable = resources.getDrawable(currentToken.resourceDrawableId, theme)
         val rowIndexPlayed = putTokenOnBoard(column, drawable)
-
-        if (canNotMakeMove == rowIndexPlayed) return
-
         val turn = Turn(columnIndex, rowIndexPlayed, drawable)
-        val isWinner = isWinner(turn)
 
-        if (isWinner) {
-            sumScore()
-            AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_win_title)
-                .setMessage(getString(R.string.dialog_message, currentToken.spanishName))
-                .setCancelable(false)
-                .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
-                    startNewGame()
-                }
-                .create()
-                .show()
+        val builderDialog = AlertDialog.Builder(this)
+            .setCancelable(false)
+            .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
+                startNewGame()
+            }
 
-            return
+        return when (game.play(turn)) {
+            Result.WIN -> win(builderDialog)
+            Result.REPLAY -> return
+            Result.NOTHING -> setCurrentToken(currentToken.otherToken)
+            Result.DRAW -> draw(builderDialog)
         }
+    }
 
-        tokensPlayed++
+    private fun win(builderDialog: AlertDialog.Builder) {
+        sumScore()
+        builderDialog
+            .setTitle(R.string.dialog_win_title)
+            .setMessage(getString(R.string.dialog_message, currentToken.spanishName))
+            .create()
+            .show()
+    }
 
-        if (maxTokens == tokensPlayed) {
-            AlertDialog.Builder(this)
-                .setTitle(R.string.dialog_draw_title)
-                .setCancelable(false)
-                .setNeutralButton(R.string.dialog_neutral_button){ _, _ ->
-                    startNewGame()
-                }
-                .create()
-                .show()
-
-            return
-        }
-
-        setCurrentToken(currentToken.otherToken)
+    private fun draw(builderDialog: AlertDialog.Builder) {
+        builderDialog
+            .setTitle(R.string.dialog_draw_title)
+            .create()
+            .show()
     }
 
     private fun startNewGame() {
@@ -113,7 +99,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startGame() {
-        tokensPlayed = 0
+        game.setTokensPlayed(0)
         clearBoard()
         setCurrentToken(initialToken)
     }
@@ -154,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun putTokenOnBoard(column: LinearLayout, drawable: Drawable, index: Int = maxIndexRow): Int {
         if (index < minIndexRow)
-            return canNotMakeMove
+            return GameConstants.CAN_NOT_MAKE_MOVE
 
         val cell = column.getChildAt(index) as ImageView
 
@@ -164,77 +150,4 @@ class MainActivity : AppCompatActivity() {
         cell.setImageDrawable(drawable)
         return index
     }
-
-    private fun isWinner(turn: Turn): Boolean {
-        val horizontalTokensCount = countHorizontal(turn)
-        if (hasLineUpEnough(plusOne(horizontalTokensCount))) return true
-
-        val verticalTokensCount = countVertical(turn)
-        if (hasLineUpEnough(plusOne(verticalTokensCount))) return true
-
-        val softDiagonalTokensCount = countSoftDiagonal(turn)
-        if (hasLineUpEnough(plusOne(softDiagonalTokensCount))) return true
-
-        val hardDiagonalTokensCount = countHardDiagonal(turn)
-        if (hasLineUpEnough(plusOne(hardDiagonalTokensCount))) return true
-
-        return false
-    }
-
-    private fun countHorizontal(turn: Turn): Int {
-        val cellsToLeft = countSameTokens(subtractOne, notModifier, turn)
-        val cellsToRight = countSameTokens(plusOne, notModifier, turn)
-
-        return cellsToLeft + cellsToRight
-    }
-
-    private fun countVertical(turn: Turn): Int {
-        val cellsToUp = countSameTokens(notModifier, plusOne, turn)
-        val cellsToDown = countSameTokens(notModifier, subtractOne, turn)
-
-        return cellsToUp + cellsToDown
-    }
-
-    private fun countSoftDiagonal(turn: Turn): Int {
-        val cellsToUpAndLeft = countSameTokens(subtractOne, plusOne, turn)
-        val cellsToDownAndRight = countSameTokens(plusOne, subtractOne, turn)
-
-        return cellsToUpAndLeft + cellsToDownAndRight
-    }
-
-    private fun countHardDiagonal(turn: Turn): Int {
-        val cellsToUpAndRight = countSameTokens(plusOne, plusOne, turn)
-        val cellsToDownAndLeft = countSameTokens(subtractOne, subtractOne, turn)
-
-        return cellsToUpAndRight + cellsToDownAndLeft
-    }
-
-    private fun getCell(columnIndex: Int, rowIndex: Int): ImageView? {
-        val column = boardLinearLayout.getChildAt(columnIndex) as LinearLayout? ?: return null
-        return column.getChildAt(rowIndex) as ImageView?
-    }
-
-    private fun countSameTokens(
-        modifierColumnIndex: (Int) -> Int,
-        modifierRowIndex: (Int) -> Int,
-        turn: Turn,
-        count: Int = 0
-    ): Int {
-        val columnIndexModified = modifierColumnIndex(turn.columnIndex)
-        val rowIndexModified = modifierRowIndex(turn.rowIndex)
-        val cell = getCell(columnIndexModified, rowIndexModified)
-
-        if (isTokenInCell(turn.drawable, cell)) {
-            val modifiedTurn = turn.copy(columnIndex = columnIndexModified, rowIndex = rowIndexModified)
-            return countSameTokens(modifierColumnIndex, modifierRowIndex, modifiedTurn, plusOne(count))
-        }
-
-        return count
-    }
-
-    private val plusOne = {num: Int -> num + 1}
-    private val subtractOne = {num: Int -> num - 1}
-    private val notModifier = {num: Int -> num}
-    private val isTokenInCell = {drawable: Drawable, cell: ImageView? -> cell != null && drawable.constantState == cell.drawable.constantState}
-    private val hasLineUpEnough = {alignedTokensCount: Int -> alignedTokensCount >= alignedTokensToWin}
 }
